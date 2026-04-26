@@ -25,10 +25,10 @@ def generer_trousseau(nom_utilisateur):
     )
 
 
-    # 4. Créer le dossier utilisateur puis sauvegarder la clé privée
-    user_dir = os.path.join(os.path.dirname(__file__), nom_utilisateur)
-    os.makedirs(user_dir, exist_ok=True)
-    private_key_path = os.path.join(user_dir, f"{nom_utilisateur}_private.pem")
+    # 4. Créer le dossier privateKey puis sauvegarder la clé privée
+    private_keys_dir = os.path.join(os.path.dirname(__file__), "privateKey")
+    os.makedirs(private_keys_dir, exist_ok=True)
+    private_key_path = os.path.join(private_keys_dir, f"{nom_utilisateur}_private.pem")
 
     with open(private_key_path, "wb") as f:
         f.write(private_pem)
