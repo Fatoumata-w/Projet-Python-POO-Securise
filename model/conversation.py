@@ -31,7 +31,9 @@ class Conversation:
         return conversationId
 
     def getParticipantsByConversationId(conversationId):
-        query = """SELECT U.userId, U.username
+        query = """SELECT U.userId, U.username, CASE WHEN U.lastSeen IS NULL THEN false
+        WHEN TIMESTAMPDIFF(SECOND, U.lastSeen, NOW()) < 20 THEN
+        true ELSE false END AS isOnline
         FROM ConversationParticipants CP
         JOIN Users U ON CP.userId = U.userId
         WHERE CP.conversationId = %s;"""

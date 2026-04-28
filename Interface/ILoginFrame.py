@@ -18,9 +18,13 @@ class LoginFrame(ctk.CTkFrame):
         
         self.btn_login = ctk.CTkButton(self, text="Se connecter", command=self.check_auth)
         self.btn_login.pack(pady=20)
+        
+        self.error_label = ctk.CTkLabel(self, text="", text_color="red")
+        self.error_label.pack()
 
-        self.btn_register = ctk.CTkButton(self, text="S'inscrire", command=self.show_registration)
+        self.btn_register = ctk.CTkLabel(self, text="Pas encore de compte ? S'inscrire", text_color="#1E88E5", cursor="hand2", font=ctk.CTkFont(size=13, underline=True))
         self.btn_register.pack(pady=10)
+        self.btn_register.bind("<Button-1>", lambda e: self.show_registration())
 
 
     def show_registration(self):
@@ -31,4 +35,4 @@ class LoginFrame(ctk.CTkFrame):
         if result>0:
             self.on_login_success(result)  
         else:
-            ctk.CTkLabel(self, text="Échec de la connexion. Veuillez réessayer.", text_color="red").pack(pady=10)
+            self.error_label.configure(text="Nom d'utilisateur ou mot de passe incorrect.")

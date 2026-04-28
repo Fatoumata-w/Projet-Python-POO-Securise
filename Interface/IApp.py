@@ -7,7 +7,7 @@ from Interface.IRegister import RegisterFrame
 class App(ctk.CTk):
     def __init__(self):
         super().__init__()
-        self.title("Mon App Pro")
+        self.title("Messagerie Instantanée")
         self.geometry("500x600")
 
         self.current_user_id = None
@@ -31,10 +31,7 @@ class App(ctk.CTk):
         self.current_frame = RegisterFrame(self, on_register_success=self.register_callback, on_cancel=self.show_login)
         self.current_frame.pack(fill="both", expand=True, padx=20, pady=20)
 
-    def register_callback(self, user_id):
-        """Cette fonction est appelée quand l'inscription réussit"""
-        self.current_user_id = user_id
-        print(f"Utilisateur {user_id} inscrit et connecté. Redirection...")
+    def register_callback(self):
         self.show_login()
 
     def show_accueil(self):
@@ -45,7 +42,7 @@ class App(ctk.CTk):
     def show_conversation(self, conversation_id):
         from Interface.IConversation import ConversationFrame
         self.clear_frame()
-        self.current_frame = ConversationFrame(self, conversation_id=conversation_id, current_user_id=self.current_user_id)
+        self.current_frame = ConversationFrame(self, conversation_id=conversation_id, current_user_id=self.current_user_id, on_back=self.show_accueil)
         self.current_frame.pack(fill="both", expand=True, padx=20, pady=20)
 
     def clear_frame(self):

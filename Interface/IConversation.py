@@ -3,22 +3,32 @@ import random
 from datetime import datetime
 from model.conversation import *
 from model.types import ParticipantItem, ConversationItem
+from model.user import Utilisateur
 
 
 
 class ConversationFrame(ctk.CTkFrame):
-    def __init__(self, parent, conversation_id=None, current_user_id = None):
+    def __init__(self, parent, conversation_id=None, current_user_id=None, on_back=None):
         super().__init__(parent, fg_color="transparent")
         self.conversation_id = conversation_id
         self.current_user_id = current_user_id
+        self.on_back = on_back
         self.envoyeur = None
         self.receveur = None
         self.timer_call = False    
         self.recherche_interlocuteurs()
 
+        # Barre supérieure
+        top_bar = ctk.CTkFrame(self, fg_color="transparent")
+        top_bar.pack(fill="x", padx=10, pady=(10, 0))
+        top_bar.grid_columnconfigure(0, weight=1)
 
-        self.label_title = ctk.CTkLabel(self, text=f"Chat avec {self.receveur.username}", font=("Roboto", 18, "bold"))
-        self.label_title.pack(pady=10)
+        self.label_title = ctk.CTkLabel(top_bar, text=f"Chat avec {self.receveur.username} ({'En ligne' if self.receveur.isOnline else 'Hors ligne'})", font=("Roboto", 18, "bold"))
+        self.label_title.grid(row=0, column=0, sticky="w")
+        
+
+        self.btn_back = ctk.CTkButton(top_bar, text="← Accueil", width=110, command=self._retour_accueil)
+        self.btn_back.grid(row=0, column=1, sticky="e")
 
         self.chat_display = ctk.CTkScrollableFrame(self, width=450, height=300)
         self.chat_display.pack(expand=True, fill="both", padx=10, pady=10)
@@ -44,14 +54,13 @@ class ConversationFrame(ctk.CTkFrame):
 
     def rafraichir_messages(self):        
         items = len(self.ma_liste_de_conversations)
-
         self.ma_liste_de_conversations = Conversation.readConversation(self.conversation_id, self.current_user_id)
-        
         if (items < len(self.ma_liste_de_conversations)):
             for item in self.ma_liste_de_conversations[items:]:
                 self.creer_bulle_message(item)   
-    
-        
+        Utilisateur.update_last_seen(self.current_user_id)
+        self.recherche_interlocuteurs()
+        self.label_title.configure(text=f"Chat avec {self.receveur.username} ({'En ligne' if self.receveur.isOnline else 'Hors ligne'})")
         self.chat_display._parent_canvas.yview_moveto(1.0)
 
 
@@ -104,7 +113,7 @@ class ConversationFrame(ctk.CTkFrame):
     def ajouter_message(self):
         texte = self.entry_message.get()
         if texte.strip() != "":
-            
+            Utilisateur.update_last_seen(self.current_user_id)
             nouveau_item = ConversationItem(
                 content=texte,
                 date=datetime.now().strftime("%H:%M"),
@@ -118,6 +127,10 @@ class ConversationFrame(ctk.CTkFrame):
             self.creer_bulle_message(nouveau_item)            
             self.entry_message.delete(0, "end")
             self.chat_display._parent_canvas.yview_moveto(1.0)
+
+    def _retour_accueil(self):
+        if self.on_back:
+            self.on_back()
 
     def destroy(self):
             if hasattr(self, 'timer_id'):

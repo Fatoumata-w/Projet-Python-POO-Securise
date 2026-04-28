@@ -5,6 +5,7 @@ from datetime import datetime
 class ParticipantItem:
     userId: int
     username: str
+    isOnline: bool = False
 
 @dataclass
 class ConversationItem:
@@ -13,3 +14,8 @@ class ConversationItem:
     username: str
     role: str
     userId: int
+
+@dataclass
+class RegisterResponse:
+    success: bool = False
+    message: str = ""

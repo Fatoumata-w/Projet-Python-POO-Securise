@@ -34,8 +34,30 @@ def SelectData(query, variables):
     finally:
         if 'db' in locals() and db.is_connected():
             db.close()
-    
-    
+
+def UpdateQuery(table, data, conditions):
+    try:
+        db = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="",
+            database="messageriesecurisee"
+        )
+        cursor = db.cursor()
+        set_clause = ', '.join([f"{key} = %s" for key in data.keys()])
+        where_clause = ' AND '.join([f"{key} = %s" for key
+    in conditions.keys()])
+        sql = f"UPDATE {table} SET {set_clause} WHERE {where_clause}"
+        cursor.execute(sql, list(data.values()) + list(conditions.values()))
+        db.commit()
+        return cursor.rowcount
+    except mysql.connector.Error as err:
+        print(f"Erreur lors de la mise à jour : {err}")
+        return None
+    finally:
+        if 'db' in locals() and db.is_connected():
+            db.close()
+            
 def InsertQuery(table, data):
     try:
         # Reconnexion à la base de données
