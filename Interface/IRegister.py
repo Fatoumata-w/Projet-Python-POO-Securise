@@ -24,7 +24,6 @@ class RegisterFrame(ctk.CTkFrame):
 
 
     def register_user(self):
-        # Ici, vous feriez votre inscription DB
         result = Utilisateur.inscrire_utilisateur(self.user_entry.get(), self.pwd_entry.get())
         if result>0:
             self.on_register_success(result)  # Passer l'ID utilisateur à la fonction de succès

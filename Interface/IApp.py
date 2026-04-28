@@ -8,7 +8,7 @@ class App(ctk.CTk):
     def __init__(self):
         super().__init__()
         self.title("Mon App Pro")
-        self.geometry("500x400")
+        self.geometry("500x600")
 
         self.current_user_id = None
         self.current_frame = None
@@ -24,7 +24,7 @@ class App(ctk.CTk):
         """Cette fonction est appelée quand la connexion réussit"""
         self.current_user_id = user_id
         print(f"Utilisateur {user_id} connecté. Redirection...")
-        self.show_dashboard()
+        self.show_accueil()
     
     def show_registration(self):
         self.clear_frame()
@@ -37,9 +37,15 @@ class App(ctk.CTk):
         print(f"Utilisateur {user_id} inscrit et connecté. Redirection...")
         self.show_login()
 
-    def show_dashboard(self):
+    def show_accueil(self):
         self.clear_frame()
-        self.current_frame = Accueil(self, self.current_user_id)
+        self.current_frame = Accueil(self, self.current_user_id, on_open_conversation=self.show_conversation)
+        self.current_frame.pack(fill="both", expand=True, padx=20, pady=20)
+
+    def show_conversation(self, conversation_id):
+        from Interface.IConversation import ConversationFrame
+        self.clear_frame()
+        self.current_frame = ConversationFrame(self, conversation_id=conversation_id, current_user_id=self.current_user_id)
         self.current_frame.pack(fill="both", expand=True, padx=20, pady=20)
 
     def clear_frame(self):

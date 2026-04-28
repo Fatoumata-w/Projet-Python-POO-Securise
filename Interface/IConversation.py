@@ -2,12 +2,12 @@ import customtkinter as ctk
 import random
 from datetime import datetime
 from model.conversation import *
-
+from model.types import ParticipantItem, ConversationItem
 
 
 
 class ConversationFrame(ctk.CTkFrame):
-    def __init__(self, parent, controller, conversation_id=None, current_user_id = None):
+    def __init__(self, parent, conversation_id=None, current_user_id = None):
         super().__init__(parent, fg_color="transparent")
         self.conversation_id = conversation_id
         self.current_user_id = current_user_id
@@ -40,38 +40,24 @@ class ConversationFrame(ctk.CTkFrame):
         if self.timer_call:
             self.rafraichir_messages()
         self.timer_call = True
-        self.timer_id = self.after(30000, self.lancer_timer)
+        self.timer_id = self.after(10000, self.lancer_timer)
 
     def rafraichir_messages(self):        
-
-        
-
-        
         items = len(self.ma_liste_de_conversations)
 
-        self.ma_liste_de_conversations.append(Conversation.readConversation(self.conversation_id, self.current_user_id))
+        self.ma_liste_de_conversations = Conversation.readConversation(self.conversation_id, self.current_user_id)
         
         if (items < len(self.ma_liste_de_conversations)):
             for item in self.ma_liste_de_conversations[items:]:
-                self.creer_bulle_message(item)        
+                self.creer_bulle_message(item)   
+    
+        
         self.chat_display._parent_canvas.yview_moveto(1.0)
 
 
 
     def recherche_interlocuteurs(self):
-        # ICI IL FAUT ALLER CHERCHER EN BASE LES PARTICIPANTS
-        mes_participants = [
-            ParticipantMock(
-                userId= 10,
-                username= "Alice"
-            ),
-            ParticipantMock(
-                userId= 11,
-                username= "Bob"
-            )
-        ]
-
-        # On ne récupère que le participant qui n'est pas l'utilisateur en cours
+        mes_participants = Conversation.getParticipantsByConversationId(self.conversation_id)
         for item in mes_participants:
             if item.userId != self.current_user_id:
                 self.receveur = item
@@ -79,33 +65,10 @@ class ConversationFrame(ctk.CTkFrame):
                 self.envoyeur = item
 
     def charger_messages(self):
-        # On vide l'affichage actuel (si nécessaire)
         for widget in self.chat_display.winfo_children():
             widget.destroy()
 
-        self.ma_liste_de_conversations = [
-            ConversationMock(
-                content = "Salut ! Comment ça va ?", 
-                date = "2023-10-27 10:00", 
-                username = "Alice",
-                role = "envoyeur",
-                userId = 10
-            ),                        
-            ConversationMock(
-                content = "Hello ! Très bien et toi ?", 
-                date = "2023-10-27 10:05", 
-                username = "Bob",
-                role = "receveur",
-                userId = 11
-            ),
-            ConversationMock(
-                content = "Je teste mon application Python.", 
-                date = "2023-10-27 10:10", 
-                username = "Alice",
-                role = "envoyeur",
-                userId = 10
-            )
-        ]
+        self.ma_liste_de_conversations = Conversation.readConversation(self.conversation_id, self.current_user_id)
 
         for item in self.ma_liste_de_conversations:
             self.creer_bulle_message(item)
@@ -113,12 +76,12 @@ class ConversationFrame(ctk.CTkFrame):
 
     def creer_bulle_message(self, item):
         if item.userId == self.current_user_id:
-            alignement = "e"       # Droite (East)
-            couleur_bulle = "#1f538d" # Bleu
+            alignement = "e"       
+            couleur_bulle = "#1f538d" 
             texte_couleur = "white"
         else:
-            alignement = "w"       # Gauche (West)
-            couleur_bulle = "#3d3d3d" # Gris foncé
+            alignement = "w"      
+            couleur_bulle = "#3d3d3d" 
             texte_couleur = "white"
 
         # Cadre pour la bulle
@@ -142,24 +105,17 @@ class ConversationFrame(ctk.CTkFrame):
         texte = self.entry_message.get()
         if texte.strip() != "":
             
-            nouveau_item = ConversationMock(
+            nouveau_item = ConversationItem(
                 content=texte,
                 date=datetime.now().strftime("%H:%M"),
                 username= self.envoyeur.username,
                 userId = self.envoyeur.userId,
                 role="envoyeur"
             )
-            
-            # ICI : il faut l'ajouter dans la base de données !
-            # APPEL DANS LA BASE DE DONNEES
-
-            # APRES : je l'ajoute à mon objet global
+            message = Message(self.conversation_id, self.current_user_id, self.receveur.userId, texte)
+            message.saveMessage()
             self.ma_liste_de_conversations.append(nouveau_item)
-            
-            # Ajout d'une nouvelle bulle de message
-            self.creer_bulle_message(nouveau_item)
-            
-            # On efface la zone de saise
+            self.creer_bulle_message(nouveau_item)            
             self.entry_message.delete(0, "end")
             self.chat_display._parent_canvas.yview_moveto(1.0)
 

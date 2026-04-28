@@ -86,7 +86,7 @@ def SelectQuery(table, conditions=None):
         if 'db' in locals() and db.is_connected():
             db.close()
             
-def SelectArgQuery(table, columns, conditions=None):
+def SelectArgQuery(table, columns, conditions=None, operator="="):
     try:
         # Reconnexion à la base de données
         db = mysql.connector.connect(
@@ -100,7 +100,7 @@ def SelectArgQuery(table, columns, conditions=None):
         cols = ', '.join(columns)
         sql = f"SELECT {cols} FROM {table}"
         if conditions:
-            placeholders = ' AND '.join([f"{key} = %s" for key in conditions.keys()])
+            placeholders = ' AND '.join([f"{key} {operator} %s" for key in conditions.keys()])
             sql += f" WHERE {placeholders}"
             cursor.execute(sql, list(conditions.values()))
         else:

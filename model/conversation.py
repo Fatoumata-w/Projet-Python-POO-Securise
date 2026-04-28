@@ -5,11 +5,22 @@ from model.message import Message
 import base64
 from DB.BDDScript import InsertQuery, SelectData, SelectQuery, get_connection, SelectArgQuery
 from datetime import datetime
+from model.types import ParticipantItem, ConversationItem
 
 class Conversation:
     def __init__(self, participants : list):
         self.participants = participants
 
+    def recherche_conversation(current_user_id, user_id):
+        query = """SELECT CP.ConversationId
+        FROM ConversationParticipants CP
+        JOIN ConversationParticipants CP2 ON CP.conversationId = CP2.conversationId AND CP2.userId = %s
+        WHERE CP.userId = %s"""
+        result = SelectData(query, (user_id, current_user_id))
+        if result:
+            return result[0]['ConversationId']
+        return 0
+    
     def createConversation(participants):
         conversationId = InsertQuery("Conversations", {"date": datetime.now()})
         for participant in participants:
@@ -18,6 +29,16 @@ class Conversation:
                 "userId": participant
             })
         return conversationId
+
+    def getParticipantsByConversationId(conversationId):
+        query = """SELECT U.userId, U.username
+        FROM ConversationParticipants CP
+        JOIN Users U ON CP.userId = U.userId
+        WHERE CP.conversationId = %s;"""
+        result = SelectData(query, (conversationId,))
+        for i in range(len(result)):
+            result[i] = ParticipantItem(**result[i])
+        return result
 
     def getConversationIdByParticipant(current_user_id):
         query = """SELECT subquery.`conversationId`, M.`date`, M.content, U.publicKey
@@ -62,7 +83,7 @@ class Conversation:
         WHERE C.`ConversationId` = %s
         ORDER BY M.`date` ASC;"""
         messages = SelectData(query, (current_user_id, conversationId))
-        print(messages)
+        result = []
         for message in messages:
             if message['role'] == 'receveur':
                 message['content'] = Conversation.contentDechiffre(message['content'], current_user_id)
@@ -70,9 +91,9 @@ class Conversation:
             else:
                 message['content'] = Conversation.contentDechiffre(message['envoyeurContent'], current_user_id)
                 message['envoyeurContent'] = ""
-        print(messages)
-        return messages
-    
+            msg = ConversationItem( content=message['content'], date=message['date'], username=message['username'], userId=message['userId'], role=message['role'])
+            result.append(msg)
+        return result
                 
         
 

@@ -1,6 +1,7 @@
 from keys import generer_trousseau
-from DB.BDDScript import InsertQuery, SelectArgQuery, SelectQuery
+from DB.BDDScript import InsertQuery, SelectArgQuery, SelectQuery, SelectData
 from cryptographie import *
+from model.types import ParticipantItem
 
 class Utilisateur:
     
@@ -54,5 +55,13 @@ class Utilisateur:
         return user_data[0]['userId']
     
     def get_users(current_user_id):
-        users = SelectArgQuery("Users", columns=["id", "username"], conditions={"id": current_user_id}, operator="!=")
-        return users
+        query = """SELECT userId, username FROM Users WHERE userId != %s;"""
+        result = SelectData(query, (current_user_id,))
+        return [ParticipantItem(**row) for row in result]
+    
+    def get_user_by_id(user_id):
+        query = """SELECT userId, username FROM Users WHERE userId = %s;"""
+        result = SelectData(query, (user_id,))
+        if result:
+            return ParticipantItem(**result[0])
+        return None

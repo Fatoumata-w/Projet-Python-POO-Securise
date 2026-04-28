@@ -24,12 +24,11 @@ class LoginFrame(ctk.CTkFrame):
 
 
     def show_registration(self):
-        self.on_register()  # Appeler la fonction de redirection vers l'inscription
+        self.on_register()  
         
     def check_auth(self):
-        # Ici, vous feriez votre vérification DB
         result = Utilisateur.connexion_utilisateur(self.user_entry.get(), self.pwd_entry.get())
         if result>0:
-            self.on_login_success(result)  # Passer l'ID utilisateur à la fonction de succès
+            self.on_login_success(result)  
         else:
             ctk.CTkLabel(self, text="Échec de la connexion. Veuillez réessayer.", text_color="red").pack(pady=10)
