@@ -205,7 +205,6 @@ END AS isOnline
 ### 1. Cloner le dépôt
 ```sh
 git clone <url-du-repo>
-cd ProjetAissatouFatoumataDylan
 ```
 
 ### 2. Installer les dépendances
