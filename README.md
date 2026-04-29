@@ -240,5 +240,5 @@ Les utilisateurs suivants sont déjà enregistrés en base de données et peuven
 
 
 ---
-#  Messagerie Sécurisée : Application de messagerie instantanée avec chiffrement de bout en bout — Projet de groupe par Thomas,Fatoumata et Aissatou 
+# Projet de groupe par Thomas,Fatoumata et Aissatou 
 
