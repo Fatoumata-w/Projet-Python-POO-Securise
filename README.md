@@ -204,7 +204,7 @@ END AS isOnline
 
 ### 1. Cloner le dépôt
 ```sh
-git clone <url-du-repo>
+git clone https://github.com/Fatoumata-w/Projet-Python-POO-Securise
 ```
 
 ### 2. Installer les dépendances
