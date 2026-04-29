@@ -213,9 +213,9 @@ pip install customtkinter cryptography mysql-connector-python
 ```
 
 ### 3. Importer la base de données
-```sh
-mysql -u root -p messageriesecurisee < DB/messageriesecurisee_Dump.sql
-```
+1. Se connecter à **phpMyAdmin** (`http://localhost/phpmyadmin`)
+2. Créer la base de données `messageriesecurisee`
+3. Aller dans l'onglet **Importer** et importer le fichier `DB/messageriesecurisee_Dump.sql`
 
 ### 4. Lancer l'application
 ```sh
